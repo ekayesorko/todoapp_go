@@ -15,7 +15,7 @@ func ConnectDB() *gorm.DB {
 	if err != nil {
 		fmt.Println("db err", err.Error())
 	}
-	err2 := db.AutoMigrate(&domain.User{}, &domain.Todo{})
+	err2 := db.AutoMigrate(&domain.User{}, &domain.Todo{}, &domain.TodoStatus{})
 	if err2 != nil {
 		fmt.Println("migration failed")
 	}

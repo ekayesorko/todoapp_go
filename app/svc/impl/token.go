@@ -18,7 +18,7 @@ type claims struct {
 }
 
 func (t *token) CreateToken(_userID uint) (string, *errors.RestErr) {
-	expirationTime := time.Now().Add(50 * time.Minute).Unix()
+	expirationTime := time.Now().Add(600 * time.Minute).Unix()
 	atMap := &claims{
 		UserID: _userID,
 		StandardClaims: jwt.StandardClaims{

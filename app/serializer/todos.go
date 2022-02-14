@@ -12,16 +12,16 @@ type CreateTodoRequest struct {
 }
 
 type TodoResponse struct {
-	TodoId      uint   `json:"ID"`
-	Description string `json:"description"`
-	Priority    uint   `json:"priority"`
-	Status      string `json:"status"`
+	TodoId       uint   `json:"ID"`
+	Description  string `json:"description"`
+	Priority     uint   `json:"priority"`
+	Status       string `json:"status"`
+	TodoStatusID uint   `json:"todoStatusID"`
 }
 
 type GetAllTodoResponse struct {
 	UserID   uint           `json:"userID"`
 	TodoList []TodoResponse `json:"todoList"`
-	Status   string         `json:"status"`
 }
 
 type UpdateTodoRequest struct {

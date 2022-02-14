@@ -1,7 +1,6 @@
 package domain
 
 type TodoStatus struct {
-	ID    int
-	Name  string
-	Todos []Todo
+	ID     uint   `json:"ID"`
+	Status string `json:"todoStatus"`
 }

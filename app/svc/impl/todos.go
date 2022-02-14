@@ -23,18 +23,25 @@ func NewTodoService(_todoRep repository.ITodo, _tokenSvc svc.IToken) svc.ITodos 
 
 func (t *todos) Create(request serializer.CreateTodoRequest) (*serializer.TodoResponse, *errors.RestErr) {
 	todoDom := &domain.Todo{}
-	err := utils.StructToStruct(request, todoDom)
+	todoStatusDom, err := t.todoRep.FirstOrCreateStatus(request.Status)
 	if err != nil {
-		return nil, errors.NewBadRequestError(err.Error())
+		return nil, errors.NewBadRequestError(err.Error)
 	}
+	err3 := utils.StructToStruct(request, todoDom)
+	if err3 != nil {
+		return nil, errors.NewBadRequestError(err3.Error())
+	}
+	todoDom.TodoStatusID = todoStatusDom.ID
 	saveResp, err2 := t.todoRep.Save(todoDom)
 	if err2 != nil {
 		return nil, errors.NewBadRequestError(err2.Error)
 	}
 	resp := &serializer.TodoResponse{
-		TodoId:      saveResp.ID,
-		Description: saveResp.Description,
-		Priority:    saveResp.Priority,
+		TodoId:       saveResp.ID,
+		Description:  saveResp.Description,
+		Priority:     saveResp.Priority,
+		TodoStatusID: todoStatusDom.ID,
+		Status:       todoStatusDom.Status,
 	}
 	return resp, nil
 }
@@ -74,6 +81,15 @@ func (t *todos) Update(request serializer.UpdateTodoRequest) (*serializer.TodoRe
 	if err := utils.StructToStruct(request, &tDom); err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
 	}
+	var tsd *domain.TodoStatus
+	var err2 *errors.RestErr
+	if request.Status != "" {
+		tsd, err2 = t.todoRep.FirstOrCreateStatus(request.Status)
+		if err2 != nil {
+			return nil, err2
+		}
+		tDom.TodoStatusID = tsd.ID
+	}
 	resp, err := t.todoRep.Update(tDom)
 	if err != nil {
 		return nil, errors.NewNotFoundError(err.Error)
@@ -82,6 +98,7 @@ func (t *todos) Update(request serializer.UpdateTodoRequest) (*serializer.TodoRe
 	if err := utils.StructToStruct(resp, &tResp); err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
 	}
+	tResp.Status = tsd.Status
 	return tResp, nil
 }
 

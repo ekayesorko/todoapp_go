@@ -32,16 +32,19 @@ func (todos *todos) Create(ctx echo.Context) error {
 	userID := ctx.Get(_const.LoggedInUser).(*serializer.LoggedInUser).UserID
 
 	var tcs *serializer.CreateTodoRequest
-	tcs.Status = "Pending"
 
 	if err := ctx.Bind(&tcs); err != nil {
 		return ctx.JSON(http.StatusUnauthorized, "bad json")
 	}
+	if tcs.Status == "" {
+		tcs.Status = "Pending"
+	}
+	tcs.UserID = userID
+
 	if err := tcs.Validate(); err != nil {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	tcs.UserID = userID
 	resp, err := todos.todoSvc.Create(*tcs)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, err)
@@ -89,6 +92,7 @@ func (todos *todos) Update(ctx echo.Context) error {
 	}
 	upSer.ID = uint(todoID)
 	upSer.UserID = userID
+
 	if err := upSer.Validate(); err != nil {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
